@@ -36,4 +36,4 @@ CHAT_ID="your_chat_id"
 4. Run the sentinel:
 python crypto.py
 
-Developed by 0xSef | Powered by Arkhe Labs
+Developed by Sef | Powered by Arkhe Labs
