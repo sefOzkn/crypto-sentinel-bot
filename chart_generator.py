@@ -3,15 +3,15 @@ import matplotlib.pyplot as plt
 from datetime import datetime
 import os
 
-# Define file paths
 LOG_FILE = "price_log.txt"
-CHART_FILE = "bitcoin_chart_example.png"
 
-def generate_chart():
-    # Check if log file exists
+def create_chart(target_symbol):
+    """
+    Reads the log file, filters for the specific coin (BTC, ETH, or SOL),
+    and generates a trend chart.
+    """
     if not os.path.exists(LOG_FILE):
-        print(f"⚠️ Warning: {LOG_FILE} not found. Skipping chart generation.")
-        return
+        return None
 
     dates = []
     prices = []
@@ -19,45 +19,53 @@ def generate_chart():
     try:
         with open(LOG_FILE, "r", encoding="utf-8") as file:
             for line in file:
+                # Format: "2025-12-23 02:45:00 | BTC | $98000.50"
                 try:
-                    # Parse log format: "2025-12-22 15:30 -> Price $90000..."
-                    parts = line.strip().split(" -> ")
-                    if len(parts) < 2:
+                    parts = line.strip().split(" | ")
+                    if len(parts) < 3:
                         continue
                     
-                    date_part = parts[0]
-                    # Extract price safely
-                    if "Price $" in parts[1]:
-                        price_part = parts[1].split("Price $")[1].split(".")[0]
-                        
-                        dates.append(datetime.strptime(date_part, "%Y-%m-%d %H:%M:%S"))
-                        prices.append(float(price_part))
+                    time_str = parts[0]
+                    symbol = parts[1]
+                    price_str = parts[2].replace("$", "")
+
+                    # Only take data for the requested coin (e.g., only ETH)
+                    if symbol == target_symbol:
+                        dates.append(datetime.strptime(time_str, "%Y-%m-%d %H:%M:%S"))
+                        prices.append(float(price_str))
+
                 except Exception:
                     continue
+        
+        if not dates:
+            print(f"⚠️ No data found for {target_symbol}")
+            return None
 
-        if dates:
-            # Create DataFrame
-            df = pd.DataFrame({"Date": dates, "Price": prices})
-            df.set_index("Date", inplace=True)
-            
-            # Plotting
-            plt.figure(figsize=(10, 6))
-            plt.plot(df.index, df["Price"], label='Bitcoin (USD)', color='#F7931A', linewidth=2)
-            
-            plt.title('Bitcoin Price Analysis (Real-Time)', fontsize=14)
-            plt.xlabel('Date & Time', fontsize=12)
-            plt.ylabel('Price (USD)', fontsize=12)
-            plt.grid(True, linestyle='--', alpha=0.5)
-            plt.legend()
-            plt.tight_layout()
-            
-            plt.savefig(CHART_FILE)
-            print(f"✅ Chart saved to {CHART_FILE}")
-        else:
-            print("⚠️ No valid data found in logs.")
+        # Create DataFrame
+        df = pd.DataFrame({"Date": dates, "Price": prices})
+        
+        # Plot
+        plt.figure(figsize=(10, 6))
+        
+        # Color logic based on coin
+        color_map = {"BTC": "#F7931A", "ETH": "#627EEA", "SOL": "#14F195"}
+        chart_color = color_map.get(target_symbol, "blue")
+
+        plt.plot(df["Date"], df["Price"], color=chart_color, linewidth=2, label=target_symbol)
+        
+        plt.title(f'{target_symbol} Price Trend - Arkhe Labs', fontsize=14, fontweight='bold')
+        plt.xlabel('Time', fontsize=10)
+        plt.ylabel('Price (USD)', fontsize=10)
+        plt.grid(True, linestyle='--', alpha=0.5)
+        plt.legend()
+        plt.tight_layout()
+
+        filename = f"{target_symbol}_alert_chart.png"
+        plt.savefig(filename)
+        plt.close()
+        
+        return filename
 
     except Exception as e:
-        print(f"❌ Error creating chart: {e}")
-
-if __name__ == "__main__":
-    generate_chart()
+        print(f"❌ Chart Error: {e}")
+        return None
