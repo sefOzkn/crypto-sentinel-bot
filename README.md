@@ -1,6 +1,6 @@
 # 🛡️ Crypto Sentinel Bot (Arkhe Labs)
 
-An automated, cloud-native Python bot that tracks Bitcoin prices in real-time and sends professional visual alerts via Telegram when critical targets are hit.
+An automated, cloud-native Python bot that tracks **Bitcoin (BTC), Ethereum (ETH), and Solana (SOL)** prices in real-time. It sends professional visual alerts via Telegram when critical targets are hit.
 
 <p align="center">
   <img src="bitcoin_chart_example.png" width="45%" alt="Real Time Analysis">
@@ -8,6 +8,7 @@ An automated, cloud-native Python bot that tracks Bitcoin prices in real-time an
 </p>
 
 ## 🚀 Key Features
+- **Trinity Tracking:** Simultaneously monitors **BTC, ETH, and SOL**.
 - **Real-Time Monitoring:** Fetches live market data 24/7.
 - **Smart Visuals:** Generates professional trend charts using `Matplotlib` & `Pandas`.
 - **Instant Alerts:** Sends a chart + detailed report to your phone via Telegram API.
